@@ -7,8 +7,12 @@
 #include <yaml-cpp/yaml.h>
 
 #include "argparser.h"
+#include "curl.hpp"
 
 #include "../version.hpp"
+#include "../json.hpp"
+
+using namespace nlohmann;
 
 struct Package
 {
@@ -84,9 +88,38 @@ int main(int argc, char **argv)
     if (cmd == search)
     {
         const char* name = arg_command_get_string(cmd, "name");
-        printf("Searching for: %s\n", name);
-    
-        /* * Hier später deine eigentliche Suche. */
+        
+        if (name == nullptr || name[0] == '\0')
+        {
+            return 1;
+        }
+
+        auto data = curlGet(REGISTRY);
+
+        if (data.empty())
+        {
+            return 1;
+        }
+
+        json j = json::parse(data);
+
+        json package = j[name];
+
+        if (!package)
+        {
+            std::cout << "Package not found: " << name << '\n';
+            return 1;
+        }
+        
+        std::cout << "Package: " << name << '\n';
+        
+        for (const auto& [key, value] : package.items())
+        {
+            std::cout << key << ": ";
+            
+            if (value.is_string()) std::cout << value.get<std::string>();
+            else std::cout << value.dump(); std::cout << '\n';
+        }
     }
     else if (cmd == version)
     {

@@ -7,6 +7,28 @@
       "projectTarget": "mygame.exe",
       "args": [],
       "currentDir": "${workspaceRoot}"
+    },
+    {
+      "type": "default",
+      "name": "help",
+      "project": "CMakeLists.txt",
+      "projectTarget": "mygame.exe",
+      "args": [
+        "help"
+      ],
+      "currentDir": "${workspaceRoot}"
+    },
+    {
+      "type": "default",
+      "name": "search",
+      "project": "CMakeLists.txt",
+      "projectTarget": "mygame.exe",
+      "args": [
+        "search",
+        "--name",
+        "shadowdara/argparser"
+      ],
+      "currentDir": "${workspaceRoot}"
     }
   ],
   "defaults": {},
