@@ -3,3 +3,5 @@
 packages:
     - "nlohman/json"
     - "jbeder/yaml-cpp"
+    - "shadowdara/argparser"
+

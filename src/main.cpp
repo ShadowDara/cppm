@@ -6,6 +6,10 @@
 
 #include <yaml-cpp/yaml.h>
 
+#include "argparser.h"
+
+#include "../version.hpp"
+
 struct Package
 {
 	std::string pkgname;
@@ -38,11 +42,21 @@ Package parsePackage(std::string input)
 std::vector<Package> parseConf()
 {
     std::vector<Package> result;
-    YAML::Node config = YAML::LoadFile(".cpp-registry.yaml");
 
-    for (const auto& package : config["packages"])
+    try
     {
-        result.push_back(parsePackage(package.as<std::string>()));
+        YAML::Node config = YAML::LoadFile(".cpp-registry.yaml");
+
+        for (const auto& package : config["packages"])
+        {
+            result.push_back(
+                parsePackage(package.as<std::string>())
+            );
+        }
+    }
+    catch (const YAML::Exception&)
+    {
+        return {};
     }
 
     return result;
@@ -50,5 +64,48 @@ std::vector<Package> parseConf()
 
 int main(int argc, char **argv)
 {
-	std::cout << "Hello";
+    auto conf = parseConf();
+
+    ArgCommand* root = arg_command_new(NAME, "", "", false, NULL, 0);
+
+    const char* name_aliases[] = { "n" };
+    ArgCommand* search = arg_command_new("search", "search for libarys.", "", false, NULL, 0);
+    arg_command_string(search, "name", "", "File name or pattern to search for.", true, name_aliases, 1);
+    
+    const char* aliases[] = { "v", "-v", "--v", "--version" };
+    ArgCommand* version = arg_command_new("version", "Displays the version", "", false, aliases, 4);
+
+    arg_command_add_subcommand(root, search);
+    arg_command_add_subcommand(root, version);
+
+    // Parsed command
+    ArgCommand* cmd = arg_command_parse(root, argc - 1, argv + 1);
+
+    if (cmd == search)
+    {
+        const char* name = arg_command_get_string(cmd, "name");
+        printf("Searching for: %s\n", name);
+    
+        /* * Hier später deine eigentliche Suche. */
+    }
+    else if (cmd == version)
+    {
+        std::cout << VERSION "\n";
+    }
+    else
+    {
+        std::cout << NAME " - package viewer for the cpp registry: https://cpp-registry.github.io\n";
+        if (conf.size() > 0)
+        {
+            std::cout << "\nPackages:\n";
+            for (const auto& e : conf)
+            {
+                std::cout << e.owner << "/" << e.pkgname << "\n";
+            }
+        }
+    }
+    
+    arg_command_free(root);
+
+    return 0;
 }
