@@ -1,0 +1,14 @@
+{
+  "configurations": [
+    {
+      "type": "default",
+      "name": "test",
+      "project": "CMakeLists.txt",
+      "projectTarget": "mygame.exe",
+      "args": [],
+      "currentDir": "${workspaceRoot}"
+    }
+  ],
+  "defaults": {},
+  "version": "0.2.1"
+}
