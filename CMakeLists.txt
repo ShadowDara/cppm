@@ -30,7 +30,7 @@ if(MSVC)
 add_compile_options(/arch:AVX2) #make sure SIMD optimizations take place
 endif()
 
-project(mygame)
+project(c++m)
 
 
 set(GLFW_BUILD_DOCS OFF CACHE BOOL "" FORCE)
