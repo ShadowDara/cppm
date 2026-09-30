@@ -103,9 +103,13 @@ int main(int argc, char **argv)
 
         json j = json::parse(data);
 
+        if (!j.contains(name)) {
+            std::cout << "Package not found: " << name << '\n';
+            return 1;
+        }
         json package = j[name];
 
-        if (!package)
+        if (package.is_null() || package.empty())
         {
             std::cout << "Package not found: " << name << '\n';
             return 1;
