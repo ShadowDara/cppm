@@ -131,6 +131,8 @@ int main(int argc, char **argv)
     }
     else
     {
+        if (arg_command_get_bool(root, "help")) { arg_command_print_help(root); return 0; }
+
         std::cout << NAME " - package viewer for the cpp registry: https://cpp-registry.github.io\n";
         if (conf.size() > 0)
         {

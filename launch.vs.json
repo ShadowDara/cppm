@@ -14,7 +14,7 @@
       "project": "CMakeLists.txt",
       "projectTarget": "mygame.exe",
       "args": [
-        "help"
+        "--help"
       ],
       "currentDir": "${workspaceRoot}"
     },
