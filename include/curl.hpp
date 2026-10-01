@@ -3,6 +3,14 @@
 #include <cstdio>
 #include <string>
 
+#ifdef _WIN32
+    #define _popen _popen
+    #define _pclose _pclose
+#else
+    #define _popen popen
+    #define _pclose pclose
+#endif
+
 inline std::string curlGet(const std::string& url)
 {
     std::string result;
