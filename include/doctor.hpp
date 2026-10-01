@@ -4,15 +4,18 @@
 
 #include "colors.hpp"
 #include "ingitignconf.hpp"
+#include "config.hpp"
+#include "../generated_version.hpp"
 
 #include <unordered_map>
 #include <cstdlib>
 #include <filesystem>
 #include <string>
 #include <iostream>
+#include <filesystem>
 
 
-bool is_in_path(const std::string& program)
+inline bool is_in_path(const std::string& program)
 {
     const char* path_env = std::getenv("PATH");
 
@@ -73,7 +76,7 @@ bool is_in_path(const std::string& program)
     return false;
 }
 
-void doctor_print(std::string msg, bool success)
+inline void doctor_print(std::string msg, bool success, int& suc)
 {
     if (success)
     {
@@ -81,30 +84,104 @@ void doctor_print(std::string msg, bool success)
     }
     else
     {
-        std::cout << ANSI_GREEN "[FAIL]"  ANSI_END " " << msg << '\n';
+        std::cout << ANSI_RED "[FAIL]"  ANSI_END " " << msg << '\n';
+        suc++;
     }
 }
 
-void doctor()
+inline bool exists(std::string path)
 {
+    return std::filesystem::is_regular_file(path);
+}
+
+#define s no_success_count
+
+inline void doctor()
+{
+	int no_success_count = 0;
+
+	std::cout << "Running cppm doctor...\n";
+
+	doctor_print("cppm" BUILD_MESSAGE, true, s);
+
+    // CMAKE
     if (is_in_path("cmake"))
     {
-		doctor_print("cmake is installed and in PATH!", true);
+		doctor_print("cmake is installed and in PATH!", true, s);
     }
     else
     {
-        doctor_print("cmake was not found in PATH!", true);
+        doctor_print("cmake was not found in PATH!", true, s);
     }
 
-	/*std::unordered_map<std::string, std::string> config = readConfig();
-	if (config.empty())
-	{
-		std::cout << "No configuration found. Please run 'cppm init' to initialize the configuration.\n";
-		return;
+	// CMAKE_SETTINGS_FILE
+    if (exists(CMAKE_SETTINGS_FILE))
+    {
+        doctor_print("CMakeSettings.json exists!", true, s);
+    }
+    else
+    {
+        doctor_print("CMakeSettings.json does not exist!", false,s);
 	}
-	std::cout << "Configuration:\n";
-	for (const auto& [key, value] : config)
-	{
-		std::cout << key << ": " << value << '\n';
-	}*/
+
+    // GIT
+    if (is_in_path("git"))
+    {
+        doctor_print("git is installed and in PATH!", true, s);
+    }
+    else
+    {
+        doctor_print("git was not found in PATH!", false, s);
+	}
+
+    // CL EXE MSVC COMPILER
+#if WIN32
+    // CL
+    if (is_in_path("cl"))
+    {
+        doctor_print("cl is installed and in PATH!", true, s);
+    }
+    else
+    {
+        doctor_print("cl was not found in PATH!", false, s);
+	}
+#endif
+
+    if (is_in_path("gcc"))
+    {
+        doctor_print("gcc is installed and in PATH!", true, s);
+    }
+    else
+    {
+        doctor_print("gcc was not found in PATH!", false, s);
+    }
+
+    if (is_in_path("g++"))
+    {
+        doctor_print("g++ is installed and in PATH!", true, s);
+    }
+    else
+    {
+        doctor_print("g++ was not found in PATH!", false, s);
+    }
+
+    if (is_in_path("clang"))
+    {
+        doctor_print("clang is installed and in PATH!", true, s);
+    }
+    else
+    {
+        doctor_print("clang was not found in PATH!", false, s);
+    }
+
+    if (is_in_path("clang++"))
+    {
+        doctor_print("clang++ is installed and in PATH!", true, s);
+    }
+    else
+    {
+        doctor_print("clang++ was not found in PATH!", false, s);
+    }
+
+	std::cout << "\nDoctor finished with " << s << " errors!\n";
 }
