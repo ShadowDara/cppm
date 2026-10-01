@@ -13,6 +13,7 @@
 #include <string>
 #include <iostream>
 #include <filesystem>
+#include <cstdio>
 
 
 inline bool is_in_path(const std::string& program)
@@ -76,6 +77,35 @@ inline bool is_in_path(const std::string& program)
     return false;
 }
 
+inline std::string exec(const std::string& command)
+{
+#ifdef _WIN32
+    FILE* pipe = _popen((command + " 2>&1").c_str(), "r");
+#else
+    FILE* pipe = popen(command.c_str(), "r");
+#endif
+
+    if (!pipe)
+        return "";
+
+    std::string result;
+    char buffer[4096];
+
+    while (fgets(buffer, sizeof(buffer), pipe))
+        result += buffer;
+
+#ifdef _WIN32
+    int status = _pclose(pipe);
+#else
+    int status = pclose(pipe);
+#endif
+
+    if (status != 0)
+        return "";
+
+    return result;
+}
+
 inline void doctor_print(std::string msg, bool success, int& suc)
 {
     if (success)
@@ -87,6 +117,20 @@ inline void doctor_print(std::string msg, bool success, int& suc)
         std::cout << ANSI_RED "[FAIL]"  ANSI_END " " << msg << '\n';
         suc++;
     }
+}
+
+inline void doctor_print_bin(std::string binary, int &no_success_count, std::string cmd = "--version")
+{
+	bool inpath = is_in_path(binary);
+    if (inpath)
+    {
+		std::string version = exec(binary + " " + cmd);
+		doctor_print(binary + " is installed and in PATH! Version:\n" + version, true, no_success_count);
+    }
+    else
+    {
+		doctor_print(binary + " was not found in PATH!", false, no_success_count);
+	}
 }
 
 inline bool exists(std::string path)
@@ -105,82 +149,43 @@ inline void doctor()
 	doctor_print("cppm" BUILD_MESSAGE, true, s);
 
     // CMAKE
-    if (is_in_path("cmake"))
-    {
-		doctor_print("cmake is installed and in PATH!", true, s);
-    }
-    else
-    {
-        doctor_print("cmake was not found in PATH!", true, s);
-    }
+    doctor_print_bin("cmake", s);
 
-	// CMAKE_SETTINGS_FILE
+    // GIT
+    doctor_print_bin("git", s);
+
+    // CL EXE MSVC COMPILER
+#if WIN32
+    // CL
+    doctor_print_bin("cl", s, "");
+#endif
+
+    doctor_print_bin("gcc", s);
+
+    doctor_print_bin("g++", s);
+
+    doctor_print_bin("clang", s);
+
+    doctor_print_bin("clang++", s);
+
+    // CMAKE_SETTINGS_FILE
     if (exists(CMAKE_SETTINGS_FILE))
     {
         doctor_print("CMakeSettings.json exists!", true, s);
     }
     else
     {
-        doctor_print("CMakeSettings.json does not exist!", false,s);
-	}
+        doctor_print("CMakeSettings.json does not exist!", false, s);
+    }
 
-    // GIT
-    if (is_in_path("git"))
+    // CMAKE_SETTINGS_FILE
+    if (exists("Makefile"))
     {
-        doctor_print("git is installed and in PATH!", true, s);
+        doctor_print("Makefile exists!", true, s);
     }
     else
     {
-        doctor_print("git was not found in PATH!", false, s);
-	}
-
-    // CL EXE MSVC COMPILER
-#if WIN32
-    // CL
-    if (is_in_path("cl"))
-    {
-        doctor_print("cl is installed and in PATH!", true, s);
-    }
-    else
-    {
-        doctor_print("cl was not found in PATH!", false, s);
-	}
-#endif
-
-    if (is_in_path("gcc"))
-    {
-        doctor_print("gcc is installed and in PATH!", true, s);
-    }
-    else
-    {
-        doctor_print("gcc was not found in PATH!", false, s);
-    }
-
-    if (is_in_path("g++"))
-    {
-        doctor_print("g++ is installed and in PATH!", true, s);
-    }
-    else
-    {
-        doctor_print("g++ was not found in PATH!", false, s);
-    }
-
-    if (is_in_path("clang"))
-    {
-        doctor_print("clang is installed and in PATH!", true, s);
-    }
-    else
-    {
-        doctor_print("clang was not found in PATH!", false, s);
-    }
-
-    if (is_in_path("clang++"))
-    {
-        doctor_print("clang++ is installed and in PATH!", true, s);
-    }
-    else
-    {
-        doctor_print("clang++ was not found in PATH!", false, s);
+        doctor_print("Makefile does not exist!", false, s);
     }
 
 	std::cout << "\nDoctor finished with " << s << " errors!\n";
