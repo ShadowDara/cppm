@@ -110,11 +110,11 @@ inline void doctor_print(std::string msg, bool success, int& suc)
 {
     if (success)
     {
-        std::cout << ANSI_GREEN "[OK]" ANSI_END " " << msg << '\n';
+        std::cout << ANSI_GREEN "[OK]" ANSI_END " " << msg;
     }
     else
     {
-        std::cout << ANSI_RED "[FAIL]"  ANSI_END " " << msg << '\n';
+        std::cout << ANSI_RED "[FAIL]"  ANSI_END " " << msg;
         suc++;
     }
 }
@@ -146,7 +146,7 @@ inline void doctor()
 
 	std::cout << "Running cppm doctor...\n";
 
-	doctor_print("cppm" BUILD_MESSAGE, true, s);
+	doctor_print("cppm" BUILD_MESSAGE "\n", true, s);
 
     // CMAKE
     doctor_print_bin("cmake", s);
@@ -171,22 +171,35 @@ inline void doctor()
     // CMAKE_SETTINGS_FILE
     if (exists(CMAKE_SETTINGS_FILE))
     {
-        doctor_print("CMakeSettings.json exists!", true, s);
+        doctor_print("CMakeSettings.json exists!\n", true, s);
     }
     else
     {
-        doctor_print("CMakeSettings.json does not exist!", false, s);
+        doctor_print("CMakeSettings.json does not exist!\n", false, s);
     }
 
     // CMAKE_SETTINGS_FILE
     if (exists("Makefile"))
     {
-        doctor_print("Makefile exists!", true, s);
+        doctor_print("Makefile exists!\n", true, s);
     }
     else
     {
-        doctor_print("Makefile does not exist!", false, s);
+        doctor_print("Makefile does not exist!\n", false, s);
     }
 
-	std::cout << "\nDoctor finished with " << s << " errors!\n";
+#ifdef _WIN32
+    // later
+#else
+    if (exists("build/compile_commands.json"))
+    {
+        doctor_print("compile_commands.json exists!\n", true, s);
+    }
+    else
+    {
+        doctor_print("compile_commands.json does not exist!\n", false, s);
+    }
+#endif
+
+    std::cout << "\nDoctor finished with " << s << " errors!\n";
 }

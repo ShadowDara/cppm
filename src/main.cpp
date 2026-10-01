@@ -74,23 +74,37 @@ int main(int argc, char **argv)
 
     ArgCommand* root = arg_command_new(NAME, "", "", false, NULL, 0);
 
+    // Search Command
     const char* name_aliases[] = { "n" };
     ArgCommand* search = arg_command_new("search", "search for librarys.", "", false, NULL, 0);
     arg_command_string(search, "name", "", "File name or pattern to search for.", true, name_aliases, 1);
     
+    // Version Command
     const char* aliases[] = { "v", "-v", "--v", "--version" };
     ArgCommand* version = arg_command_new("version", "Displays the version", "", false, aliases, 4);
 
-	const char* doctor_aliases[] = { "d", "-d", "--d", "--doctor" };
-	ArgCommand* doctorcmd = arg_command_new("doctor", "Displays the configuration", "", false, doctor_aliases, 4);
+    // Doctor Command
+    const char* doctor_aliases[] = { "d", "-d", "--d", "--doctor" };
+    ArgCommand* doctorcmd = arg_command_new("doctor", "Displays the configuration", "", false, doctor_aliases, 4);
+
+    // Run Command
+    const char* run_aliases[] = { };
+    ArgCommand* runcmd = arg_command_new("run", "run a binary from the project", "", false, run_aliases, 0);
+
+    // Build Command
+    const char* build_aliases[] = { };
+    ArgCommand* buildcmd = arg_command_new("build", "build the project", "", false, build_aliases, 0);
 
     arg_command_add_subcommand(root, search);
     arg_command_add_subcommand(root, version);
-	arg_command_add_subcommand(root, doctorcmd);
+    arg_command_add_subcommand(root, doctorcmd);
+    arg_command_add_subcommand(root, runcmd);
+    arg_command_add_subcommand(root, buildcmd);
 
     // Parsed command
     ArgCommand* cmd = arg_command_parse(root, argc - 1, argv + 1);
 
+    // Search packages in the registry
     if (cmd == search)
     {
         const char* name = arg_command_get_string(cmd, "name");
@@ -131,18 +145,29 @@ int main(int argc, char **argv)
             else std::cout << value.dump(); std::cout << '\n';
         }
     }
+
+    // get the current version
     else if (cmd == version)
     {
         std::cout << VERSION "\n";
     }
+
+    // like flutter doctor
     else if (cmd == doctorcmd)
     {
         doctor();
-	}
+    }
+
+    // default
     else
     {
-        if (arg_command_get_bool(root, "help")) { arg_command_print_help(root); return 0; }
+	// help check
+        if (arg_command_get_bool(root, "help"))
+	{
+	    arg_command_print_help(root); return 0;
+	}
 
+	// default message
         std::cout << NAME " - package viewer for the cpp registry: https://cpp-registry.github.io\n";
         if (conf.size() > 0)
         {
