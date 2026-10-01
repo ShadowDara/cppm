@@ -3,7 +3,6 @@ bin/
 build/
 /.vs
 .idea/
-Makefile
 
 logs.txt
 
@@ -14,4 +13,6 @@ logs.txt
 #% language=German
 #% status=active
 ###### CPPM-CONFIG-SECTION-END
-.cache
+
+/.cache
+
