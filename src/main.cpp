@@ -8,6 +8,8 @@
 
 #include "argparser.h"
 #include "curl.hpp"
+#include "ingitignconf.hpp"
+#include "doctor.hpp"
 
 #include "../version.hpp"
 #include "../json.hpp"
@@ -68,6 +70,23 @@ std::vector<Package> parseConf()
 
 int main(int argc, char **argv)
 {
+    /*std::unordered_map<std::string, std::string> values{
+    {"name", "Max"},
+    {"city", "Stuttgart"},
+    {"country", "Germany"},
+    {"language", "German"},
+    {"status", "active"}
+    };
+
+    if (std::string(argv[1]) == "conf")
+    {
+		initConfig();
+        initConfig();
+		writeConfig(values);
+		std::cout << "Configuration written to .gitignore\n";
+        return 0;
+    }*/
+
     auto conf = parseConf();
 
     ArgCommand* root = arg_command_new(NAME, "", "", false, NULL, 0);
@@ -79,8 +98,12 @@ int main(int argc, char **argv)
     const char* aliases[] = { "v", "-v", "--v", "--version" };
     ArgCommand* version = arg_command_new("version", "Displays the version", "", false, aliases, 4);
 
+	const char* doctor_aliases[] = { "d", "-d", "--d", "--doctor" };
+	ArgCommand* doctorcmd = arg_command_new("doctor", "Displays the configuration", "", false, doctor_aliases, 4);
+
     arg_command_add_subcommand(root, search);
     arg_command_add_subcommand(root, version);
+	arg_command_add_subcommand(root, doctorcmd);
 
     // Parsed command
     ArgCommand* cmd = arg_command_parse(root, argc - 1, argv + 1);
@@ -129,6 +152,10 @@ int main(int argc, char **argv)
     {
         std::cout << VERSION "\n";
     }
+    else if (cmd == doctorcmd)
+    {
+        doctor();
+	}
     else
     {
         if (arg_command_get_bool(root, "help")) { arg_command_print_help(root); return 0; }

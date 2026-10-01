@@ -16,6 +16,9 @@ set(PRODUCTION_BUILD OFF CACHE BOOL "Make this a production build" FORCE)
 set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Release>:Release>")
 set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
 
+# for clang d
+set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
+
 
 #may give problems on linux
 if(PRODUCTION_BUILD)
