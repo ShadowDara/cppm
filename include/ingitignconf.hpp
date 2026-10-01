@@ -19,7 +19,8 @@ inline void initConfig()
     bool startfound = false;
     bool endfound = false;
 
-    while (std::getline(filein, line)) {
+    while (std::getline(filein, line))
+    {
         if (line.find(CPPM_GITIGNORE_CONFIG_START) != std::string::npos)
         {
             startfound = true;
@@ -28,6 +29,7 @@ inline void initConfig()
         if (line.find(CPPM_GITIGNORE_CONFIG_END) != std::string::npos)
         {
             endfound = true;
+            break;
         }
     }
 

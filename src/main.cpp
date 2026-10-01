@@ -8,7 +8,7 @@
 
 #include "argparser.h"
 #include "curl.hpp"
-#include "ingitignconf.hpp"
+#include "ignconf_json.hpp"
 #include "doctor.hpp"
 
 #include "../version.hpp"
@@ -70,29 +70,12 @@ std::vector<Package> parseConf()
 
 int main(int argc, char **argv)
 {
-    /*std::unordered_map<std::string, std::string> values{
-    {"name", "Max"},
-    {"city", "Stuttgart"},
-    {"country", "Germany"},
-    {"language", "German"},
-    {"status", "active"}
-    };
-
-    if (std::string(argv[1]) == "conf")
-    {
-		initConfig();
-        initConfig();
-		writeConfig(values);
-		std::cout << "Configuration written to .gitignore\n";
-        return 0;
-    }*/
-
     auto conf = parseConf();
 
     ArgCommand* root = arg_command_new(NAME, "", "", false, NULL, 0);
 
     const char* name_aliases[] = { "n" };
-    ArgCommand* search = arg_command_new("search", "search for libarys.", "", false, NULL, 0);
+    ArgCommand* search = arg_command_new("search", "search for librarys.", "", false, NULL, 0);
     arg_command_string(search, "name", "", "File name or pattern to search for.", true, name_aliases, 1);
     
     const char* aliases[] = { "v", "-v", "--v", "--version" };
