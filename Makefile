@@ -19,3 +19,9 @@ rebuild: clean build
 run: build
 	./$(BUILD_DIR)/$(BIN)
 
+PREFIX ?= $(HOME)/.local
+
+# local install command
+install: build
+	install -Dm755 build/$(BIN) $(PREFIX)/bin/$(BIN)
+
